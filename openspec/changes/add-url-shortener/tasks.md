@@ -13,13 +13,13 @@
 
 ## 2. Phase 2 — Redis cache-aside + per-IP rate limiting
 
-- [ ] 2.1 Add `backend/app/cache/redis_client.py` exposing `get_redis()` returning a configured `redis.asyncio.Redis` and verify unit test confirms the client connects to a running Redis (use `fakeredis` if real Redis absent)
-- [ ] 2.2 Add `backend/app/cache/url_cache.py` with `get_cached_url(code)`, `set_cached_url(code, payload, ttl=3600)`, `invalidate(code)` and verify unit tests cover hit, miss, JSON round-trip
-- [ ] 2.3 Wire cache-aside into `GET /{short_code}` and verify integration test: first request is a cache miss + DB read; second request is a cache hit + no DB query (assert via SQLAlchemy event listener counting SELECTs)
-- [ ] 2.4 Add `backend/app/middleware/rate_limit.py` with `RateLimiter` middleware that uses Redis `INCR rl:{ip}` + `EXPIRE` and verify unit tests cover under-limit, at-limit, over-limit (returns 429 with Retry-After)
-- [ ] 2.5 Apply the middleware to `POST /api/urls` only (not the redirect) and verify integration test: 11th request from one IP returns 429
-- [ ] 2.6 Spin up 2 uvicorn workers in a subprocess-based test and verify the rate limit is enforced across both workers (assert that combined requests from one IP stop at N)
-- [ ] 2.7 Phase 2 verification: `pytest -q` all green; write `notes/phase-2-explanation.md` covering cache-aside tradeoffs, why we picked cache-aside over read-through, and the multi-worker rate-limit invariant
+- [x] 2.1 Add `backend/app/cache/redis_client.py` exposing `get_redis()` returning a configured `redis.asyncio.Redis` and verify unit test confirms the client connects to a running Redis (use `fakeredis` if real Redis absent)
+- [x] 2.2 Add `backend/app/cache/url_cache.py` with `get_cached_url(code)`, `set_cached_url(code, payload, ttl=3600)`, `invalidate(code)` and verify unit tests cover hit, miss, JSON round-trip
+- [x] 2.3 Wire cache-aside into `GET /{short_code}` and verify integration test: first request is a cache miss + DB read; second request is a cache hit + no DB query (assert via SQLAlchemy event listener counting SELECTs)
+- [x] 2.4 Add `backend/app/middleware/rate_limit.py` with `RateLimiter` middleware that uses Redis `INCR rl:{ip}` + `EXPIRE` and verify unit tests cover under-limit, at-limit, over-limit (returns 429 with Retry-After)
+- [x] 2.5 Apply the middleware to `POST /api/urls` only (not the redirect) and verify integration test: 11th request from one IP returns 429
+- [x] 2.6 Spin up 2 uvicorn workers in a subprocess-based test and verify the rate limit is enforced across both workers (assert that combined requests from one IP stop at N)
+- [x] 2.7 Phase 2 verification: `pytest -q` all green; write `notes/phase-2-explanation.md` covering cache-aside tradeoffs, why we picked cache-aside over read-through, and the multi-worker rate-limit invariant
 
 ## 3. Phase 3 — Async click analytics pipeline
 

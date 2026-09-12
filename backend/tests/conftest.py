@@ -1,26 +1,34 @@
-"""Pytest fixtures shared across the test suite.
-
-Phase 1 only needs the FastAPI app + httpx client wired against a fresh
-in-memory SQLite database per test. Phase 2+ will extend this file with a
-Redis client (fakeredis) and worker setup.
-"""
+"""Pytest fixtures shared across the test suite."""
 import os
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 
 import pytest_asyncio
+from fakeredis import aioredis as fakeredis_aio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from app.cache.redis_client import get_redis
 from app.db.models import Base
 from app.db.session import get_session
 from app.main import create_app
 
 
 @pytest_asyncio.fixture
-async def app():
-    """Fresh in-memory SQLite + dependency-overridden FastAPI app per test."""
+async def redis_client():
+    client = fakeredis_aio.FakeRedis(decode_responses=True)
+    yield client
+    await client.aclose()
+
+
+@pytest_asyncio.fixture
+async def app(redis_client):
+    """Fresh in-memory SQLite + dependency-overridden FastAPI app per test.
+
+    Overrides `get_session` with a fresh in-memory SQLite and `get_redis`
+    with a per-test fakeredis instance. Tests are fully isolated.
+    """
     test_engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -33,6 +41,7 @@ async def app():
 
     application = create_app()
     application.dependency_overrides[get_session] = _override_session
+    application.dependency_overrides[get_redis] = lambda: redis_client
     yield application
 
     await test_engine.dispose()
