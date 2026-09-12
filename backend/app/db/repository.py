@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Url
+from app.db.models import Click, Url
 from app.shortcode import generate_code
 
 
@@ -64,3 +66,32 @@ class UrlRepository:
             select(Url.id).where(Url.short_code == short_code)
         )
         return result.scalar_one_or_none() is not None
+
+
+class ClickRepository:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def create(
+        self,
+        url_id: int,
+        clicked_at: datetime,
+        referrer: str | None,
+        user_agent: str | None,
+        browser: str | None,
+        os: str | None,
+        device: str | None,
+    ) -> Click:
+        click = Click(
+            url_id=url_id,
+            clicked_at=clicked_at,
+            referrer=referrer,
+            user_agent=user_agent,
+            browser=browser,
+            os=os,
+            device=device,
+        )
+        self.session.add(click)
+        await self.session.commit()
+        await self.session.refresh(click)
+        return click

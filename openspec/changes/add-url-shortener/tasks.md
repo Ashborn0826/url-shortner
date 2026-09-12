@@ -23,13 +23,13 @@
 
 ## 3. Phase 3 — Async click analytics pipeline
 
-- [ ] 3.1 Add second Alembic migration creating `clicks` table and `(url_id, clicked_at DESC)` index and verify `alembic upgrade head` applies cleanly
-- [ ] 3.2 In `GET /{short_code}` handler, after sending 302, enqueue JSON `{short_code, ts, referrer, user_agent}` via `LPUSH clicks:queue` (fire-and-forget) and verify the redirect still responds under 50ms with Redis empty/unreachable
-- [ ] 3.3 Add `backend/app/analytics/ua.py` wrapping `user-agents` PyPI lib and verify unit tests parse Chrome/Firefox/Safari/iOS-Android correctly
-- [ ] 3.4 Add `backend/app/worker.py` with `arq.WorkerSettings` defining the `process_click(ctx, event)` function: parse UA, INSERT click row, log success; verify unit test runs `process_click` against an in-memory event and asserts DB row exists
-- [ ] 3.5 Configure arq retry policy (3 attempts, exponential backoff 1s/4s/16s) and DLQ key `clicks:dlq` and verify unit test: event that always fails is moved to DLQ after 3 attempts
-- [ ] 3.6 End-to-end integration test: spin worker in a subprocess, hit redirect 100 times, wait up to 5s, assert exactly 100 `clicks` rows exist
-- [ ] 3.7 Phase 3 verification: `pytest -q` all green; write `notes/phase-3-explanation.md` covering why we accept duplicate clicks (no idempotency key), why arq over plain Redis list, and what "best-effort" means for analytics
+- [x] 3.1 Add second Alembic migration creating `clicks` table and `(url_id, clicked_at DESC)` index and verify `alembic upgrade head` applies cleanly
+- [x] 3.2 In `GET /{short_code}` handler, after sending 302, enqueue JSON `{short_code, ts, referrer, user_agent}` via `LPUSH clicks:queue` (fire-and-forget) and verify the redirect still responds under 50ms with Redis empty/unreachable
+- [x] 3.3 Add `backend/app/analytics/ua.py` wrapping `user-agents` PyPI lib and verify unit tests parse Chrome/Firefox/Safari/iOS-Android correctly
+- [x] 3.4 Add `backend/app/worker.py` with `arq.WorkerSettings` defining the `process_click(ctx, event)` function: parse UA, INSERT click row, log success; verify unit test runs `process_click` against an in-memory event and asserts DB row exists
+- [x] 3.5 Configure arq retry policy (3 attempts, exponential backoff 1s/4s/16s) and DLQ key `clicks:dlq` and verify unit test: event that always fails is moved to DLQ after 3 attempts
+- [x] 3.6 End-to-end integration test: spin worker in a subprocess, hit redirect 100 times, wait up to 5s, assert exactly 100 `clicks` rows exist
+- [x] 3.7 Phase 3 verification: `pytest -q` all green; write `notes/phase-3-explanation.md` covering why we accept duplicate clicks (no idempotency key), why arq over plain Redis list, and what "best-effort" means for analytics
 
 ## 4. Phase 4 — Stats endpoint + React + Vite frontend
 
