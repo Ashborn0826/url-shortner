@@ -42,7 +42,7 @@
 
 ## 5. Phase 5 — Docker compose + final verification
 
-- [ ] 5.1 Write `infra/docker-compose.yml` with Postgres 15 and Redis 7 services and verify `docker compose up -d` brings both healthy
-- [ ] 5.2 Write `backend/.env.example` with sane defaults (DATABASE_URL pointing at compose service, REDIS_URL likewise, rate-limit defaults)
-- [ ] 5.3 Add `backend/scripts/smoke.py` that exercises POST/GET/stats end-to-end against the compose stack and exits non-zero on any failure
-- [ ] 5.4 Final verification: run `openspec validate add-url-shortener --strict` then `pytest -q` then the smoke script; commit the spec artifacts + code per the project's git workflow
+- [x] 5.1 Write `infra/docker-compose.yml` with Postgres 15 and Redis 7 services and verify `docker compose up -d` brings both healthy
+- [x] 5.2 Write `backend/.env.example` with sane defaults (DATABASE_URL pointing at compose service, REDIS_URL likewise, rate-limit defaults)
+- [x] 5.3 Add `backend/scripts/smoke.py` that exercises POST/GET/stats end-to-end against the compose stack and exits non-zero on any failure
+- [x] 5.4 Final verification: run `openspec validate add-url-shortener --strict` then `pytest -q` then the smoke script; commit the spec artifacts + code per the project's git workflow
