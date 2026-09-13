@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import redirect, urls
+from app.config import settings
 
 
 def create_app() -> FastAPI:
@@ -14,6 +16,17 @@ def create_app() -> FastAPI:
         docs_url="/_internal/docs",
         redoc_url="/_internal/redoc",
         openapi_url="/_internal/openapi.json",
+    )
+
+    # CORS for the React frontend (Vite dev server on :5173).
+    # In production both apps live behind the same domain and CORS is
+    # not needed; this is a dev convenience.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[settings.frontend_origin],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     @app.get("/health")

@@ -33,12 +33,12 @@
 
 ## 4. Phase 4 — Stats endpoint + React + Vite frontend
 
-- [ ] 4.1 Add `GET /api/urls/{short_code}/stats` returning `{total_clicks, clicks_by_day, top_referrers, top_browsers}` and verify unit tests cover each aggregate (use a seeded fixture DB)
-- [ ] 4.2 Add CORS middleware allowing `http://localhost:5173` and verify `curl -H "Origin: http://localhost:5173" -i ...` returns the right `Access-Control-Allow-*` headers
-- [ ] 4.3 Scaffold frontend: `npm create vite@latest frontend -- --template react-ts` and verify `cd frontend && npm run dev` serves on `:5173`
-- [ ] 4.4 Build `<CreateUrlForm />` component calling `POST /api/urls` and showing the resulting `short_url`; verify by running the dev server and submitting a URL manually + a Vitest component test
-- [ ] 4.5 Build `<StatsDashboard code={...} />` component calling `GET /api/urls/{code}/stats` and rendering total + day bars + top lists and verify by Vitest component test using MSW to mock the API
-- [ ] 4.6 Phase 4 verification: `pytest -q` all green in both `backend/` and `frontend/`; write `notes/phase-4-explanation.md` covering read-time vs write-time aggregation and the SPA/backend separation
+- [x] 4.1 Add `GET /api/urls/{short_code}/stats` returning `{total_clicks, clicks_by_day, top_referrers, top_browsers}` and verify unit tests cover each aggregate (use a seeded fixture DB)
+- [x] 4.2 Add CORS middleware allowing `http://localhost:5173` and verify `curl -H "Origin: http://localhost:5173" -i ...` returns the right `Access-Control-Allow-*` headers
+- [x] 4.3 Scaffold frontend: `npm create vite@latest frontend -- --template react-ts` and verify `cd frontend && npm run dev` serves on `:5173`
+- [x] 4.4 Build `<CreateUrlForm />` component calling `POST /api/urls` and showing the resulting `short_url`; verify by running the dev server and submitting a URL manually + a Vitest component test
+- [x] 4.5 Build `<StatsDashboard code={...} />` component calling `GET /api/urls/{code}/stats` and rendering total + day bars + top lists and verify by Vitest component test using MSW to mock the API
+- [x] 4.6 Phase 4 verification: `pytest -q` all green in both `backend/` and `frontend/`; write `notes/phase-4-explanation.md` covering read-time vs write-time aggregation and the SPA/backend separation
 
 ## 5. Phase 5 — Docker compose + final verification
 

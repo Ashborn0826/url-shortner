@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -95,3 +95,51 @@ class ClickRepository:
         await self.session.commit()
         await self.session.refresh(click)
         return click
+
+    async def count_by_url(self, url_id: int) -> int:
+        result = await self.session.execute(
+            select(func.count()).select_from(Click).where(Click.url_id == url_id)
+        )
+        return result.scalar() or 0
+
+    async def clicks_by_day(self, url_id: int, days: int = 30) -> list[dict]:
+        """Return [{day: 'YYYY-MM-DD', count: N}, ...] for the last `days`."""
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        result = await self.session.execute(
+            select(
+                func.date(Click.clicked_at).label("day"),
+                func.count().label("count"),
+            )
+            .where(Click.url_id == url_id, Click.clicked_at >= since)
+            .group_by("day")
+            .order_by("day")
+        )
+        return [{"day": str(row.day), "count": row.count} for row in result]
+
+    async def top_referrers(self, url_id: int, limit: int = 5) -> list[dict]:
+        """Top referrers by click count. NULL referrer buckets into '(direct)'."""
+        result = await self.session.execute(
+            select(
+                func.coalesce(Click.referrer, "(direct)").label("referrer"),
+                func.count().label("count"),
+            )
+            .where(Click.url_id == url_id)
+            .group_by("referrer")
+            .order_by(func.count().desc())
+            .limit(limit)
+        )
+        return [{"referrer": row.referrer, "count": row.count} for row in result]
+
+    async def top_browsers(self, url_id: int, limit: int = 5) -> list[dict]:
+        """Top browsers by click count. Skips clicks with NULL browser."""
+        result = await self.session.execute(
+            select(
+                Click.browser.label("browser"),
+                func.count().label("count"),
+            )
+            .where(Click.url_id == url_id, Click.browser.isnot(None))
+            .group_by(Click.browser)
+            .order_by(func.count().desc())
+            .limit(limit)
+        )
+        return [{"browser": row.browser, "count": row.count} for row in result]

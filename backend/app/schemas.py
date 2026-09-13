@@ -35,3 +35,28 @@ class CreateUrlResponse(BaseModel):
     short_url: str
     long_url: str
     created_at: datetime
+
+
+class DayStat(BaseModel):
+    day: str
+    count: int
+
+
+class ReferrerStat(BaseModel):
+    referrer: str
+    count: int
+
+
+class BrowserStat(BaseModel):
+    browser: str
+    count: int
+
+
+class StatsResponse(BaseModel):
+    short_code: str
+    long_url: str
+    total_clicks: int
+    created_at: datetime
+    clicks_by_day: list[DayStat]
+    top_referrers: list[ReferrerStat]
+    top_browsers: list[BrowserStat]
